@@ -24,7 +24,7 @@ button.g{background:transparent;color:var(--tx);border:1px solid var(--bd)}
 </style></head><body><div id="app">Yükleniyor…</div>
 <script>
 // ===== AYARLAR: CSV dosyalarının repo içindeki yolu =====
-const CFG={profiles:"player_profiles.csv",transfers:"transfer_history.csv",top:4000,since:2003,cache:"tz_data_v1"};
+const CFG={profiles:"player_profiles.csv",transfers:"transfer_history.csv",top:20000,since:1985,cache:"tz_data_v2"};
 const app=document.getElementById("app"),LOGO=id=>`https://tmssl.akamaized.net/images/wappen/head/${id}.png`,NOW=2026.8;
 const norm=s=>s.toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ı/g,"i");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -42,15 +42,15 @@ step:r=>{F=F||r.meta.fields;fn(r.data,F);if(++n%25000===0)app.innerHTML=`<p>${la
 complete:()=>n?res(F):rej(new Error(`${url} boş ya da bulunamadı.`)),error:()=>rej(new Error(`${url} okunamadı. Dosya repoda bu yolda mı?`))})})}
 function need(F,label,...c){const r=col(F,...c);if(!r)throw new Error(`'${label}' sütunu bulunamadı.\nMevcut sütunlar: ${F.join(", ")}`);return r}
 async function build(){
-const prof={};let pc;await readCsv(CFG.profiles,"Oyuncular",(r,F)=>{pc=pc||{id:need(F,"oyuncu id","player_id"),n:need(F,"oyuncu adı","player_name","name"),img:col(F,"image","photo"),v:col(F,"market_value")};
-const id=r[pc.id];if(id&&!prof[id])prof[id]={n:r[pc.n],img:pc.img&&/^http/.test(r[pc.img]||"")?r[pc.img]:"",v:pc.v?money(r[pc.v]):0}});
+const prof={};let pc;await readCsv(CFG.profiles,"Oyuncular",(r,F)=>{pc=pc||{id:need(F,"oyuncu id","player_id"),n:need(F,"oyuncu adı","player_name","name"),img:col(F,"image","photo"),v:col(F,"market_value"),c:col(F,"current_club_name")};
+const id=r[pc.id];if(id&&!prof[id])prof[id]={n:r[pc.n],img:pc.img&&/^http/.test(r[pc.img]||"")?r[pc.img]:"",v:pc.v?money(r[pc.v]):0,c:pc.c?(r[pc.c]||""):""}});
 const T={};let tc;await readCsv(CFG.transfers,"Transferler",(r,F)=>{tc=tc||{id:need(F,"oyuncu id","player_id"),to:need(F,"hedef takım id","to_team_id","to_club_id"),tn:need(F,"hedef takım adı","to_team_name","to_club_name"),d:col(F,"transfer_date","date"),s:col(F,"season"),v:col(F,"value_at_transfer","market_value")};
 const id=r[tc.id],to=r[tc.to];if(!id||!to||!prof[id])return;const t=toYear(tc.d?r[tc.d]:null,tc.s?r[tc.s]:null);if(t==null)return;(T[id]??=[]).push([t,to,r[tc.tn],tc.v?money(r[tc.v]):0])});
 const BAD=/retired|without club|career break|unknown|^ban$|suspended/i,clubs={},L=[];
 for(const id in T){const g=T[id].sort((a,b)=>a[0]-b[0]),s=[];let f=prof[id].v;
 g.forEach(([t,to,tn,v],i)=>{f=Math.max(f,v);const end=i+1<g.length?g[i+1][0]:(t>NOW-8?NOW:t+3);if(BAD.test(tn)||end-t<0.5)return;s.push([+to,+t.toFixed(1),+end.toFixed(1)]);clubs[to]=tn});
-if(s.length&&Math.max(...s.map(x=>x[2]))>=CFG.since)L.push({f,k:s.length,id:+id,n:prof[id].n,img:prof[id].img,s})}
-L.sort((a,b)=>b.f-a.f||b.k-a.k);const players=L.slice(0,CFG.top).map(({id,n,img,s})=>({id,n,img,s}));
+if(s.length&&Math.max(...s.map(x=>x[2]))>=CFG.since)L.push({f,k:s.length,id:+id,n:prof[id].n,img:prof[id].img,c:prof[id].c,s})}
+L.sort((a,b)=>b.f-a.f||b.k-a.k);const players=L.slice(0,CFG.top).map(({id,n,img,c,s})=>({id,n,img,c,s}));
 const used=new Set(players.flatMap(p=>p.s.map(x=>x[0])));for(const c in clubs)if(!used.has(+c))delete clubs[c];
 return{clubs,players}}
 async function load(){
@@ -90,7 +90,7 @@ const last=chain[chain.length-1];
 h+=`<div class="card"><div class="mu">Şu an: <b>${esc(P[last].n)}</b> — ortak takımda oynadığı bir futbolcu yaz</div><div class="clubs">${clubsOf(last).map(cl).join("")}</div><p></p><input id="q" placeholder="Futbolcu ara…" value="${esc(q)}" autocomplete="off"><div class="msg">${esc(msg)}</div><div id="sg"></div><div class="row sp mu">Hata: ${mist}/5<button class="g" id="un" ${chain.length<2?"disabled":""}>Geri al</button></div></div>`;
 app.innerHTML=h;const inp=document.getElementById("q"),sg=document.getElementById("sg");
 inp.oninput=()=>{q=inp.value;const v=norm(q);if(!v){sg.innerHTML="";return}const L=[];for(let i=0;i<P.length&&L.length<6;i++)if(!chain.includes(i)&&norm(P[i].n).includes(v))L.push(i);
-sg.innerHTML=L.length?`<div class="card" style="padding:0">`+L.map(i=>`<div class="sg row" data-i="${i}">${av(i)}${esc(P[i].n)}</div>`).join("")+`</div>`:"";
+sg.innerHTML=L.length?`<div class="card" style="padding:0">`+L.map(i=>`<div class="sg row" data-i="${i}">${av(i)}<div>${esc(P[i].n)}<div class="mu">${esc(P[i].c||"")}</div></div></div>`).join("")+`</div>`:"";
 sg.querySelectorAll(".sg").forEach(e=>e.onclick=()=>pick(+e.dataset.i))};
 if(q)inp.oninput();
 document.getElementById("un").onclick=()=>{if(chain.length>1){chain.pop();msg="";q="";render()}}}
