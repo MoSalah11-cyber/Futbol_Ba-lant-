@@ -1,40 +1,49 @@
 <!DOCTYPE html>
 <html lang="tr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Transfer Zinciri</title>
-<meta name="theme-color" content="#000000"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"><script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<title>Futbol Zinciri</title>
+<meta name="theme-color" content="#000000"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"><script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
-:root{--bg:#000;--card:#0e0e0e;--tx:#fff;--mu:#9a9378;--ac:#FFC400;--bad:#ff6b5e}
+:root{--ac:#FFC400;--tx:#f5f3ea;--mu:#8f8a77;--bad:#ff6b5e;--glass:rgba(255,255,255,.045);--line:rgba(255,255,255,.10)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:radial-gradient(120% 50% at 50% 0,#1c1600 0,#000 65%) #000;color:var(--tx);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top) 0 calc(96px + env(safe-area-inset-bottom))}
-#app{max-width:480px;margin:0 auto;padding:16px}p{margin:8px 0}
-h1{font:15px/1.6 "Press Start 2P",monospace;color:var(--ac);margin:6px 0}.mu{color:var(--mu);font-size:12px}.big{font:12px/1.6 "Press Start 2P",monospace;color:var(--ac)}
-.card{background:var(--card);border:1.5px solid rgba(255,196,0,.45);border-radius:22px;padding:14px;margin:12px 0}
+html{background:#000}
+body{margin:0;color:var(--tx);font:500 14px/1.5 "Plus Jakarta Sans",Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) 0 calc(28px + env(safe-area-inset-bottom))}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(110% 45% at 50% -5%,rgba(255,196,0,.13),transparent 70%),#000}
+#app{max-width:480px;margin:0 auto;padding:18px 16px}p{margin:8px 0}
+.logo{font-weight:800;font-size:21px;letter-spacing:-.5px;color:#fff;line-height:1.2}.logo span{color:var(--ac)}.logo.xl{font-size:36px}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--glass);font-size:12px;font-weight:600;color:#e9e5d2}.pill i{width:3px;height:3px;border-radius:50%;background:#666}
+.mu{color:var(--mu);font-size:12.5px;font-weight:500}.lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.big{font-size:18px;font-weight:800;color:var(--ac);letter-spacing:-.2px}
+.card{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:22px;padding:16px;margin:14px 0;box-shadow:0 10px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06)}
 .row{display:flex;align-items:center;gap:10px}.sp{justify-content:space-between}
-.av{display:flex;align-items:center;justify-content:center;position:relative;flex:none;width:100%;height:100%;border-radius:50%;border:3px solid var(--ac);overflow:hidden;font-weight:700;color:#fff}
-.av.sm{width:42px;height:42px;border-width:2px;font-size:12px}
-.av img,.cl img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#111}
+.splash{min-height:calc(100vh - 36px);min-height:calc(100dvh - 36px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center}
+.spin{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.1);border-top-color:var(--ac);animation:sp .8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.av{display:flex;align-items:center;justify-content:center;position:relative;flex:none;width:100%;height:100%;border-radius:50%;border:2px solid rgba(255,196,0,.85);overflow:hidden;font-weight:700;color:#fff;box-shadow:0 0 0 3px rgba(255,196,0,.08),0 8px 20px rgba(255,196,0,.16)}
+.av::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 3px 10px rgba(0,0,0,.55);pointer-events:none;z-index:2}
+.av.sm{width:42px;height:42px;font-size:12px}.av img,.cl img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#111}
 .cl{position:relative;display:inline-flex;width:22px;height:22px;border-radius:7px;overflow:hidden;align-items:center;justify-content:center;font-size:7px;color:#fff}.cl img{object-fit:contain;padding:2px;background:#fff}
-input{width:100%;padding:14px 18px;font:16px system-ui,sans-serif;border:2px solid var(--ac);background:#000;color:#fff;border-radius:999px;outline:0}
-input::placeholder{color:#6f6849}
-button{font:700 14px system-ui,sans-serif;padding:11px 18px;border:0;border-radius:999px;background:var(--ac);color:#000;cursor:pointer;box-shadow:0 6px 18px rgba(255,196,0,.22)}
-button:active{transform:scale(.96)}button.g{background:transparent;color:var(--ac);border:1.5px solid var(--ac);box-shadow:none;padding:9px 14px}button:disabled{opacity:.3;cursor:default}
-.sg{padding:8px 10px;border-bottom:1px solid #2a2510;cursor:pointer}.sg:last-child{border:0}.sg:active{background:#1c1700}
-.msg{color:var(--bad);font-size:13px;min-height:20px;margin:8px 0 0}.info{color:var(--ac);font-size:13px;margin:4px 0 8px}
-.stats{display:flex;gap:8px;text-align:center}.stats div{flex:1}.stats b{display:block;font:18px "Press Start 2P",monospace;color:var(--ac);font-weight:400;margin-bottom:6px}
-.map{position:relative;margin:12px 0;border-radius:28px;border:1.5px solid rgba(255,196,0,.3);background:radial-gradient(90% 40% at 50% 0,rgba(255,196,0,.10),transparent),#0a0a0a;overflow:hidden}
+input{width:100%;padding:15px 20px;font:500 16px "Plus Jakarta Sans",system-ui,sans-serif;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;border-radius:999px;outline:0;transition:border-color .2s,box-shadow .2s}
+input:focus{border-color:rgba(255,196,0,.65);box-shadow:0 0 0 4px rgba(255,196,0,.12)}input::placeholder{color:#6f6a58}
+button{font:700 14px "Plus Jakarta Sans",system-ui,sans-serif;padding:13px 22px;border:0;border-radius:999px;background:var(--ac);color:#111;cursor:pointer;box-shadow:0 8px 22px rgba(255,196,0,.22);transition:transform .15s,opacity .15s}
+button:active{transform:scale(.97)}button:disabled{opacity:.35;cursor:default}
+button.g{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);color:#e9e5d2;border:1px solid rgba(255,255,255,.14);box-shadow:none;padding:9px 14px;font-size:13px;font-weight:600}
+button.ar{background:none;border:0;box-shadow:none;color:rgba(255,255,255,.38);padding:6px 8px;display:flex}button.ar:disabled{opacity:.15}
+.sg{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.07);cursor:pointer}.sg:last-child{border:0}.sg:active{background:rgba(255,196,0,.08)}
+.sg b,.nm{font-weight:700}.msg{color:var(--bad);font-size:13px;font-weight:600;min-height:20px;margin:8px 0 0}.info{color:var(--ac);font-size:13px;font-weight:600;margin:4px 0 8px}
+.stats{display:flex;gap:8px;text-align:center}.stats div{flex:1}.stats b{display:block;font-size:26px;font-weight:800;color:var(--ac);margin-bottom:2px}
+.map{position:relative;margin:14px 0;border-radius:28px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,196,0,.06),rgba(255,255,255,.02));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden}
 .trail{position:absolute;left:0;top:0;width:100%}
 .nd{position:absolute;width:140px;transform:translate(-50%,-32px);text-align:center}
 .isl{position:relative;width:64px;height:64px;margin:0 auto}.isl.big{width:72px;height:72px;margin-top:-4px}
-.isl::after{content:"";position:absolute;left:50%;bottom:-10px;width:78px;height:14px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(255,196,0,.5),rgba(255,196,0,0))}
-.isl .av{position:relative;z-index:1}.isl.cur .av{box-shadow:0 0 0 4px rgba(255,196,0,.22),0 0 24px rgba(255,196,0,.55)}
-.isl.ph{border:2.5px dashed rgba(255,196,0,.55);border-radius:50%;background:rgba(255,196,0,.06)}.isl.ph .av{border-width:0}
-.isl.q{display:flex;align-items:center;justify-content:center;font:18px "Press Start 2P",monospace;color:var(--ac)}
-.nm{font-weight:700;font-size:13px;line-height:1.2;margin:14px auto 0;max-width:132px}
-.tag{position:absolute;top:-17px;left:50%;transform:translateX(-50%);font:7px "Press Start 2P",monospace;color:var(--ac);white-space:nowrap}
-.chips{display:flex;justify-content:center;gap:4px;margin-top:5px}.hc{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:5px;font-size:11px;color:var(--mu)}
-#nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:12px;background:rgba(10,10,10,.92);backdrop-filter:blur(8px);border:2px solid var(--ac);border-radius:999px;padding:8px 10px;z-index:9}
-#nav button{width:42px;height:42px;padding:0;border-radius:50%}.gn{text-align:center;min-width:132px;color:var(--ac);font:11px/1.6 "Press Start 2P",monospace}.gn .mu{font:9px "Press Start 2P",monospace}
+.isl::after{content:"";position:absolute;left:50%;bottom:-10px;width:78px;height:14px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(255,196,0,.26),transparent)}
+.isl .av{position:relative;z-index:1}.isl.cur .av{box-shadow:0 0 0 4px rgba(255,196,0,.12),0 0 26px rgba(255,196,0,.28)}
+.isl.ph{border:1.5px dashed rgba(255,196,0,.45);border-radius:50%;background:rgba(255,255,255,.04)}.isl.ph .av{border-width:0;box-shadow:none}
+.isl.q{display:flex;align-items:center;justify-content:center}
+.nm{font-size:14px;line-height:1.25;letter-spacing:-.1px;margin:14px auto 0;max-width:132px}
+.tag{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,196,0,.9);white-space:nowrap}
+.chips{display:flex;justify-content:center;gap:4px;margin-top:6px}.hc{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;font-size:11px;font-weight:600;color:var(--mu)}
+.gnum{position:absolute;left:0;right:0;bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px}.gt{font-size:13px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,.38);min-width:46px;text-align:center}
 </style></head><body><div id="app"></div>
 <script>
 // ===== AYARLAR: CSV dosyalarının repo içindeki yolu =====
@@ -91,7 +100,7 @@ P.forEach((p,i)=>{if(f[i]>=80&&p.s.some(x=>TR4.includes(x[0])))W[i]=10}); // Gal
 const old=[];P.forEach((p,i)=>{if(f[i]<80&&Math.max(...p.s.map(x=>x[2]))<2019)old.push([i,s2(p)])});
 old.sort((a,b)=>b[1]-a[1]).forEach(([i],r)=>{if(r<150)W[i]=Math.max(W[i],5);else if(r<600)W[i]=Math.max(W[i],1)});
 POP=W;
-TODAY=dayNo();CUR=TODAY;READY=true;if(S.user)loadPuzzle(CUR);
+TODAY=dayNo();CUR=TODAY;READY=true;if(S.user)loadPuzzle(CUR);else login();
 setInterval(tick,20000);document.addEventListener("visibilitychange",tick)}
 function makePuzzle(n){const R=rng(n*7919+13),pool=[];W.forEach((w,i)=>{if(w>0)pool.push(i)});
 for(let k=0;k<400;k++){const a=wpick(R,pool),{d}=bfs(a),c=[];for(const j of pool)if(d[j]>=3&&d[j]<=4)c.push(j);if(c.length){const b=wpick(R,c);return[a,b,d[b]]}}return null}
@@ -113,39 +122,43 @@ const cl=c=>`<span class="cl" title="${esc(CN[c]||"")}" style="background:hsl(${
 const hc=c=>`<div class="hc">${cl(c)}<span>${esc(CN[c]||"")}</span></div>`;
 const livew=n=>S.days[n]?.w&&S.days[n].live;
 const streak=()=>{let n=TODAY;if(!livew(n))n--;let c=0;while(n>0&&livew(n)){c++;n--}return c};
-function start(){if(!S.user)login();else app.innerHTML=`<h1>TRANSFER ZİNCİRİ</h1><p class="mu" id="prog">Yükleniyor…</p>`}
-function login(){app.innerHTML=`<h1>TRANSFER<br>ZİNCİRİ</h1><p class="mu">İki futbolcuyu ortak takım arkadaşlarıyla bağla. Her gün yeni bir grid!</p><div class="card"><p class="big">HESAP OLUŞTUR</p><p class="mu">Bir nick seç. Bir daha giriş yapman gerekmez.</p><input id="u" maxlength="16" placeholder="Nick" autocomplete="off" autocapitalize="off"><div class="msg" id="e"></div><button id="go" style="width:100%">BAŞLA</button></div><p class="mu" id="prog"></p>`;
+function start(){app.innerHTML=`<div class="splash"><div class="logo xl">Futbol <span>Zinciri</span></div><div class="spin"></div><div class="mu" id="prog">Yükleniyor…</div></div>`}
+function login(){app.innerHTML=`<div class="splash"><div class="logo xl">Futbol <span>Zinciri</span></div><p class="mu" style="max-width:290px;margin:0">İki futbolcuyu ortak takım arkadaşlarıyla bağla. Her gün yeni bir grid.</p><div class="card" style="width:100%;text-align:left"><div class="lbl">Hesap oluştur</div><p class="mu">Bir nick seç, bir daha giriş yapman gerekmez.</p><input id="u" maxlength="16" placeholder="Nick" autocomplete="off" autocapitalize="off"><div class="msg" id="e"></div><button id="go" style="width:100%">Başla</button></div></div>`;
 document.getElementById("go").onclick=()=>{const v=document.getElementById("u").value.trim();if(!/^[\p{L}\p{N}_.\-]{3,16}$/u.test(v))return document.getElementById("e").textContent="3-16 karakter: harf, rakam, _ . -";
-S.user=v;S.created=Date.now();save();if(READY)loadPuzzle(CUR);else start()}}
-function share(){const r=S.days[CUR],t=`TRANSFER ZİNCİRİ #${CUR}\n${P[A].n} → ${P[B].n}\n${"🟨".repeat(r.l)} (${r.l} halka, en kısa ${OPT})${r.m?"\n❌×"+r.m:""}${r.h?"\n💡×"+r.h:""}\n🔥 Seri: ${streak()}`;
+S.user=v;S.created=Date.now();save();loadPuzzle(CUR)}}
+function share(){const r=S.days[CUR],t=`FUTBOL ZİNCİRİ #${CUR}\n${P[A].n} → ${P[B].n}\n${"🟨".repeat(r.l)} (${r.l} halka, en kısa ${OPT})${r.m?"\n❌×"+r.m:""}${r.h?"\n💡×"+r.h:""}\n🔥 Seri: ${streak()}`;
 if(navigator.share)navigator.share({text:t}).catch(()=>{});else try{navigator.clipboard.writeText(t);alert("Kopyalandı!")}catch(e){prompt("Kopyala:",t)}}
-const nav=()=>`<div id="nav"><button class="g" id="pv" ${CUR<=1?"disabled":""}>◀</button><div class="gn">GRID #${CUR} ${done()?"✓":""}<div class="mu">${CUR===TODAY?"BUGÜN":"ARŞİV"}</div></div><button class="g" id="nx" ${CUR>=TODAY?"disabled":""}>▶</button></div>`;
+const ARL='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',ARR='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+const QM='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-2.9 2.4-2.9 4.4"/><circle cx="12" cy="18.2" r=".7" fill="#FFC400"/></svg>';
+const FL='<svg width="12" height="12" viewBox="0 0 24 24" fill="#FFC400"><path d="M12 2c1 4-3 5.5-3 9.5a3 3 0 0 0 6 0c0-1-.4-1.8-1-2.6 2.8 1.4 5 3.8 5 7.1a7 7 0 0 1-14 0C5 9 12 7 12 2z"/></svg>';
+const BULB='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>';
+const gnum=()=>`<div class="gnum"><button class="ar" id="pv" ${CUR<=1?"disabled":""} aria-label="Önceki grid">${ARL}</button><span class="gt">#${CUR}${done()?" ✓":""}</span><button class="ar" id="nx" ${CUR>=TODAY?"disabled":""} aria-label="Sonraki grid">${ARR}</button></div>`;
 const bindNav=()=>{document.getElementById("pv").onclick=()=>loadPuzzle(CUR-1);document.getElementById("nx").onclick=()=>loadPuzzle(CUR+1)};
 function mapHtml(){const dn=done(),nodes=[];
 if(dn)for(let i=chain.length-1;i>=0;i--)nodes.push({i:chain[i],ci:i});
 else{nodes.push({i:B,t:1},{ph:1});for(let i=chain.length-1;i>=0;i--)nodes.push({i:chain[i],ci:i})}
-const ROW=108,L=nodes.length,H=(L-1)*ROW+140,pts=nodes.map((_,k)=>({x:k===0||k===L-1?50:(k%2?27:73),y:56+k*ROW}));
+const ROW=108,L=nodes.length,H=(L-1)*ROW+176+(HN>=2?30:0),pts=nodes.map((_,k)=>({x:k===0||k===L-1?50:(k%2?27:73),y:56+k*ROW}));
 let d=`M${pts[0].x} ${pts[0].y}`;for(let k=1;k<L;k++){const a=pts[k-1],b=pts[k],m=(a.y+b.y)/2;d+=` C${a.x} ${m} ${b.x} ${m} ${b.x} ${b.y}`}
 const hp=!dn&&HN>=3&&HINT.mid!=null&&!chain.includes(HINT.mid)?HINT.mid:null;
 const nd=nodes.map((n,k)=>{const p=pts[k];let inner;
-if(n.ph)inner=hp!=null?`<div class="tag">İPUCU</div><div class="isl ph">${av(hp)}</div><div class="nm">${esc(P[hp].n)}</div>`:`<div class="isl ph q">?</div>`;
+if(n.ph)inner=hp!=null?`<div class="tag">İPUCU</div><div class="isl ph">${av(hp)}</div><div class="nm">${esc(P[hp].n)}</div>`:`<div class="isl ph q">${QM}</div>`;
 else{const isT=dn?n.ci===chain.length-1:!!n.t,isS=n.ci===0,cur=!dn&&n.ci===chain.length-1;let x="";
 if(n.ci>0)x+=`<div class="chips">${shared(chain[n.ci-1],n.i).map(cl).join("")}</div>`;
 if(isT&&HN>=1)x+=hc(HINT.bc);if(isS&&HN>=2)x+=hc(HINT.ac);
 inner=`${isT?'<div class="tag">HEDEF</div>':isS?'<div class="tag">BAŞLANGIÇ</div>':""}<div class="isl${cur?" cur":""}${isT?" big":""}">${av(n.i)}</div><div class="nm">${esc(P[n.i].n)}</div>${x}`}
 return `<div class="nd" style="left:${p.x}%;top:${p.y}px">${inner}</div>`}).join("");
-return `<div class="map" style="height:${H}px"><svg class="trail" viewBox="0 0 100 ${H}" preserveAspectRatio="none" style="height:${H}px"><path d="${d}" fill="none" stroke="rgba(255,196,0,.4)" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 9" vector-effect="non-scaling-stroke"/></svg>${nd}</div>`}
+return `<div class="map" style="height:${H}px"><svg class="trail" viewBox="0 0 100 ${H}" preserveAspectRatio="none" style="height:${H}px"><path d="${d}" fill="none" stroke="rgba(255,196,0,.4)" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 9" vector-effect="non-scaling-stroke"/></svg>${nd}${gnum()}</div>`}
 function hint(){if(HN>=3||done())return;HN++;
-info=HN===1?`💡 ${P[B].n}, ${CN[HINT.bc]} forması giymiş.`:HN===2?`💡 ${P[A].n}, ${CN[HINT.ac]} forması giymiş.`:`💡 Zincirde ${P[HINT.mid].n} var.`;sp();render()}
+info=HN===1?`${P[B].n}, ${CN[HINT.bc]} forması giymiş.`:HN===2?`${P[A].n}, ${CN[HINT.ac]} forması giymiş.`:`Zincirde ${P[HINT.mid].n} var.`;sp();render()}
 function render(){if(!S.user)return login();const dn=done();
-let h=`<h1>TRANSFER ZİNCİRİ</h1><span class="mu">👤 ${esc(S.user)} · 🔥 ${streak()}</span>${mapHtml()}`;
+let h=`<div class="hd"><div class="logo">Futbol <span>Zinciri</span></div><div class="pill">${esc(S.user)}<i></i>${FL}${streak()}</div></div>${mapHtml()}`;
 if(dn){const r=S.days[CUR],n=Object.values(S.days).filter(d=>d&&d.w).length;
 h+=`<div class="card"><p class="big">ÇÖZDÜN! ${r.l} HALKA</p><p class="mu">Hata: ${r.m||0} · İpucu: ${r.h||0}/3. ${r.l===OPT?"Mükemmel, en kısa yol!":"En kısa yol: "+HINT.path.map(i=>esc(P[i].n)).join(" → ")}</p><button id="sh" style="width:100%">PAYLAŞ</button></div>
 <div class="card stats"><div><b>${n}</b><span class="mu">çözülen</span></div><div><b>${streak()}</b><span class="mu">seri</span></div></div>`+(CUR===TODAY?`<p class="mu" style="text-align:center">Yeni grid 00:00'da!</p>`:"");
-app.innerHTML=h+nav();document.getElementById("sh").onclick=share;bindNav();return}
+app.innerHTML=h;document.getElementById("sh").onclick=share;bindNav();return}
 const last=chain[chain.length-1];
-h+=`<div class="card"><div class="mu">Şu an <b style="color:var(--ac)">${esc(P[last].n)}</b> adasındasın. Onunla ortak takımda oynamış bir futbolcu yaz.</div><p></p><input id="q" placeholder="Futbolcu ara…" value="${esc(q)}" autocomplete="off"><div class="msg">${esc(msg)}</div><div class="info">${esc(info)}</div><div id="sg"></div><div class="row sp"><span class="mu">Hata: ${mist} · İpucu: ${HN}/3</span><span class="row"><button class="g" id="hn" ${HN>=3?"disabled":""}>💡 İpucu</button><button class="g" id="un" ${chain.length<2?"disabled":""}>↶ Geri al</button></span></div></div>`;
-app.innerHTML=h+nav();bindNav();const inp=document.getElementById("q"),sg=document.getElementById("sg");
+h+=`<div class="card"><div class="mu">Şu an <b style="color:var(--ac)">${esc(P[last].n)}</b> adasındasın. Onunla ortak takımda oynamış bir futbolcu yaz.</div><p></p><input id="q" placeholder="Futbolcu ara…" value="${esc(q)}" autocomplete="off"><div class="msg">${esc(msg)}</div><div class="info">${esc(info)}</div><div id="sg"></div><div class="row sp"><span class="mu">Hata: ${mist} · İpucu: ${HN}/3</span><span class="row"><button class="g" id="hn" ${HN>=3?"disabled":""}>${BULB}İpucu</button><button class="g" id="un" ${chain.length<2?"disabled":""}>Geri al</button></span></div></div>`;
+app.innerHTML=h;bindNav();const inp=document.getElementById("q"),sg=document.getElementById("sg");
 inp.oninput=()=>{q=inp.value;const v=norm(q);if(!v){sg.innerHTML="";return}const L=[];for(let i=0;i<P.length&&L.length<6;i++)if(!chain.includes(i)&&norm(P[i].n).includes(v))L.push(i);
 sg.innerHTML=L.length?`<div class="card" style="padding:0;margin:8px 0">`+L.map(i=>`<div class="sg row" data-i="${i}">${av(i,"sm")}<div>${esc(P[i].n)}<div class="mu">${esc(P[i].c||"")}</div></div></div>`).join("")+`</div>`:"";
 sg.querySelectorAll(".sg").forEach(e=>e.onclick=()=>pick(+e.dataset.i))};
