@@ -50,6 +50,17 @@ button.ar{background:none;border:0;box-shadow:none;color:rgba(255,255,255,.38);p
 .cf{text-align:center;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,196,0,.9);margin-top:4px}
 .shr{display:flex;gap:8px;margin:16px 0 4px}.shr button{flex:1;justify-content:center;padding:12px 8px}
 .gnum.st{position:static;margin:8px 0}
+.hd{position:relative;z-index:1}
+button.mb{background:none;border:0;box-shadow:none;padding:6px;margin-left:-6px;color:rgba(255,255,255,.35);display:flex;border-radius:10px}
+.dim{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}.dim.on{opacity:1;pointer-events:auto}
+.drw{position:fixed;top:0;bottom:0;left:0;width:78%;max-width:300px;transform:translateX(-102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);background:rgba(14,14,14,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-right:1px solid var(--line);padding:calc(24px + env(safe-area-inset-top)) 16px 24px;z-index:21;display:flex;flex-direction:column;gap:4px}.drw.on{transform:none}
+button.mi{background:none;box-shadow:none;border:0;text-align:left;color:#e9e5d2;font:600 15px "Plus Jakarta Sans",system-ui,sans-serif;padding:14px 14px;border-radius:14px;width:100%}button.mi.on{background:rgba(255,196,0,.10);color:var(--ac)}
+details.qa{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:0 16px;margin:10px 0}
+details.qa summary{list-style:none;cursor:pointer;padding:15px 0;font-weight:700;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+details.qa summary::-webkit-details-marker{display:none}
+details.qa summary::after{content:"";flex:none;width:7px;height:7px;border-right:2px solid var(--mu);border-bottom:2px solid var(--mu);transform:rotate(45deg);transition:transform .2s;margin-right:4px}
+details.qa[open] summary::after{transform:rotate(-135deg)}
+details.qa p{color:#bdb8a3;font-size:13.5px;line-height:1.6;margin:0 0 15px}
 </style></head><body><div id="app"></div>
 <script>
 // ===== AYARLAR: CSV dosyalarının repo içindeki yolu =====
@@ -89,7 +100,7 @@ load().then(init).catch(e=>app.innerHTML=`<div class="card"><b>Hata</b><pre styl
 
 // ===== Oyun =====
 const EPOCH=Date.UTC(2026,10,1),TZ="Europe/Istanbul"; // EPOCH: #1 numaralı gridin tarihi
-const TR4=[141,36,114,449];let HINT,HN=0,info="",IDX={},POP=[],W=[];
+const TR4=[141,36,114,449];let VIEW="game",MENU=false,TIER=[],HINT,HN=0,info="",IDX={},POP=[],W=[];
 const dayNo=()=>{const[y,m,d]=new Date().toLocaleDateString("sv",{timeZone:TZ}).split("-").map(Number);return Math.max(1,Math.floor((Date.UTC(y,m-1,d)-EPOCH)/864e5)+1)};
 const ov=(x,y)=>Math.min(x[2],y[2])-Math.max(x[1],y[1])>=0.25;
 const shared=(i,j)=>{const r=new Set;for(const x of P[i].s)for(const y of P[j].s)if(x[0]===y[0]&&ov(x,y))r.add(x[0]);return[...r]};
@@ -101,15 +112,17 @@ ADJ=P.map(()=>new Set);for(const c in by){const L=by[c];for(let x=0;x<L.length;x
 // Popülerlik: piyasa değeri (açık eşikler) + eski oyuncular için büyük kulüplerde geçirilen yıllar. Bilinmeyenler günün oyuncusu olmaz (W=0).
 const pres={};P.slice(0,1500).forEach(p=>new Set(p.s.map(x=>x[0])).forEach(c=>pres[c]=(pres[c]||0)+1));
 const f=P.map(p=>p.f||0),s2=p=>{let b=0;for(const[c,x,y]of p.s)b=Math.max(b,Math.min(y-x,10)*(pres[c]||0));return b};
-W=f.map(x=>x>=150?10:x>=80?5:x>=50?1:0); // değer: >=15M çok sık, >=8M sık, >=5M ara sıra, altı hiç (günün oyuncusu olmaz)
-P.forEach((p,i)=>{if(f[i]>=80&&p.s.some(x=>TR4.includes(x[0])))W[i]=10}); // Galatasaray/Fenerbahçe/Beşiktaş/Trabzonspor'da oynamış tanınmışlar
+TIER=f.map(x=>x>=150?3:x>=80?2:x>=50?1:0); // 3 çok bilinen, 2 orta, 1 az bilinen, 0 hiç tanınmayan (asla çıkmaz)
+P.forEach((p,i)=>{if(f[i]>=80&&p.s.some(x=>TR4.includes(x[0])))TIER[i]=3});
 const old=[];P.forEach((p,i)=>{if(f[i]<80&&Math.max(...p.s.map(x=>x[2]))<2019)old.push([i,s2(p)])});
-old.sort((a,b)=>b[1]-a[1]).forEach(([i],r)=>{if(r<150)W[i]=Math.max(W[i],5);else if(r<600)W[i]=Math.max(W[i],1)});
-POP=W;
+old.sort((a,b)=>b[1]-a[1]).forEach(([i],r)=>{if(r<150)TIER[i]=Math.max(TIER[i],2);else if(r<600)TIER[i]=Math.max(TIER[i],1)});
 TODAY=dayNo();CUR=TODAY;READY=true;if(S.user)loadPuzzle(CUR);else login();
 setInterval(tick,20000);document.addEventListener("visibilitychange",tick)}
-function makePuzzle(n){const R=rng(n*7919+13),pool=[];W.forEach((w,i)=>{if(w>0)pool.push(i)});
-for(let k=0;k<400;k++){const a=wpick(R,pool),{d}=bfs(a),c=[];for(const j of pool)if(d[j]>=3&&d[j]<=4)c.push(j);if(c.length){const b=wpick(R,c);return[a,b,d[b]]}}return null}
+function makePuzzle(n){const R=rng(n*7919+13),by=[[],[],[],[]];TIER.forEach((t,i)=>by[t].push(i));
+const tryP=(t1,t2)=>{for(let k=0;k<300;k++){const a=by[t1][Math.floor(R()*by[t1].length)],{d}=bfs(a),c=by[t2].filter(j=>j!==a&&d[j]>=3&&d[j]<=4);
+if(c.length){const b=c[Math.floor(R()*c.length)];return R()<.5?[a,b,d[b]]:[b,a,d[b]]}}return null};
+const u=R(),[t1,t2]=u<.40?[3,3]:u<.74?[3,2]:u<.90?[2,2]:[3,1]; // %40 çok+çok, %34 çok+orta, %16 orta+orta, %10 çok+az bilinen (az bilinen hep çok bilinenle eşleşir)
+return tryP(t1,t2)||tryP(3,3)||tryP(3,2)}
 const clubsOf=i=>[...new Set(P[i].s.map(x=>x[0]))];
 const done=()=>!!(S.days[CUR]&&S.days[CUR].w);
 const sp=()=>{S.prog[CUR]={v:2,c:chain.map(i=>P[i].id),m:mist,h:HN};save()};
@@ -184,23 +197,43 @@ return `<div class="nd" style="left:${p.x}%;top:${p.y}px">${inner}</div>`}).join
 return `<div class="map" style="height:${H}px"><svg class="trail" viewBox="0 0 100 ${H}" preserveAspectRatio="none" style="height:${H}px"><path d="${d}" fill="none" stroke="rgba(255,196,0,.4)" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 9" vector-effect="non-scaling-stroke"/></svg>${nd}${navIn?gnum():""}</div>`}
 function hint(){if(HN>=3||done())return;HN++;
 info=HN===1?`${P[B].n}, ${CN[HINT.bc]} forması giymiş.`:HN===2?`${P[A].n}, ${CN[HINT.ac]} forması giymiş.`:`Zincirde ${P[HINT.mid].n} var.`;sp();render()}
-function render(){if(!S.user)return login();const dn=done();
-let h=`<div class="hd"><div class="logo">Futbol <span>Zinciri</span></div><div class="pill">${esc(S.user)}<i></i>${FL}${streak()}</div></div>${mapHtml()}`;
+const MB='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
+const hdr=()=>`<div class="hd"><div class="row" style="gap:6px"><button class="mb" id="mb" aria-label="Menü">${MB}</button><div class="logo">Futbol <span>Zinciri</span></div></div><div class="pill">${esc(S.user)}<i></i>${FL}${streak()}</div></div>`;
+const drawer=()=>`<div class="dim" id="dim"></div><aside class="drw" id="drw"><div class="logo" style="margin:4px 14px 18px">Futbol <span>Zinciri</span></div>${[["game","Oyun"],["profile","Profil"],["faq","SSS"]].map(([v,t])=>`<button class="mi ${VIEW===v?"on":""}" data-v="${v}">${t}</button>`).join("")}</aside>`;
+function paint(h){app.innerHTML=h+drawer();const dm=document.getElementById("dim"),dr=document.getElementById("drw"),set=o=>{MENU=o;dm.classList.toggle("on",o);dr.classList.toggle("on",o)};
+document.getElementById("mb").onclick=()=>set(true);dm.onclick=()=>set(false);
+dr.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{VIEW=b.dataset.v;MENU=false;render()})}
+function profile(){const n=Object.values(S.days).filter(d=>d&&d.w).length;
+paint(hdr()+`<div class="card"><div class="lbl">Profil</div><p class="mu">Takma adını buradan değiştirebilirsin. Çözdüğün gridler ve serin korunur.</p><input id="nn" maxlength="16" value="${esc(S.user)}" autocomplete="off" autocapitalize="off"><div class="msg" id="pe"></div><button id="sv" style="width:100%">Kaydet</button></div><div class="card stats"><div><b>${n}</b><span class="mu">çözülen</span></div><div><b>${streak()}</b><span class="mu">seri</span></div></div>`);
+document.getElementById("sv").onclick=()=>{const v=document.getElementById("nn").value.trim();if(!/^[\p{L}\p{N}_.\-]{3,16}$/u.test(v))return document.getElementById("pe").textContent="3-16 karakter: harf, rakam, _ . -";S.user=v;save();VIEW="game";render()}}
+const QA=[["Oyun nasıl oynanır?","Her gün iki futbolcu verilir: hedef üstte, başlangıç altta. Başlangıç oyuncusuyla aynı dönemde ortak bir takımda oynamış bir futbolcu yaz, sonra onunla oynamış birini yaz... Hedef oyuncuyla oynamış birine ulaştığında zincir otomatik tamamlanır. Ne kadar az halkayla bağlarsan o kadar iyi."],
+["Yeni grid ne zaman geliyor?","Her gece saat 00:00'da (Türkiye saati) yeni grid otomatik yüklenir. Sayfa açıkken bile kendiliğinden güncellenir."],
+["Geçmiş gridleri oynayabilir miyim?","Evet. Ana ekranda başlangıç oyuncusunun altındaki oklarla önceki gridlere geçip sırayla oynayabilirsin. Geçmiş gridler günlük seriye sayılmaz."],
+["Tahmin hakkım var mı?","Tahmin sınırı yok. Yanlış tahminler sadece “hata” olarak sayılır ve paylaşımında görünür."],
+["İpuçları nasıl çalışıyor?","Her gridde 3 ipucu hakkın var. 1. ipucu hedef oyuncunun bir takımını, 2. ipucu başlangıç oyuncusunun bir takımını, 3. ipucu da en kısa zincirde yer alan bir oyuncuyu gösterir."],
+["Kimler takım arkadaşı sayılıyor?","Aynı kulüpte en az birkaç ay aynı dönemde bulunmuş oyuncular. Veri Transfermarkt transfer geçmişine dayanır, maça çıkıp çıkmadıkları dikkate alınmaz."],
+["Günün oyuncuları nasıl seçiliyor?","Oyuncular tanınırlıklarına göre gruplanır. Hiç tanınmayanlar günün oyuncusu olmaz. Az bilinen bir oyuncu çıkarsa diğeri mutlaka çok bilinen biri olur, böylece zorluk dengede kalır."],
+["Serim nasıl artıyor?","Günün gridini o gün çözersen seri bir artar. Bir günü atlarsan seri sıfırlanır."],
+["İlerlemem nerede saklanıyor?","Hesabın ve ilerlemen şimdilik bu cihazın tarayıcısında saklanır. Tarayıcı verisini silersen veya başka cihaz kullanırsan sıfırlanır."],
+["Sonucumu nasıl paylaşırım?","Bir gridi çözünce zincirin kart olarak çıkar. Altındaki butonlarla görseli indirebilir, Instagram'da veya X'te paylaşabilirsin."]];
+function faq(){paint(hdr()+`<div class="card" style="margin-bottom:4px"><div class="lbl">Sıkça sorulan sorular</div></div>`+QA.map(([q,a])=>`<details class="qa"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join(""))}
+function render(){if(!S.user)return login();if(VIEW==="profile")return profile();if(VIEW==="faq")return faq();const dn=done();
+let h=hdr()+mapHtml();
 if(dn){const r=S.days[CUR],n=Object.values(S.days).filter(d=>d&&d.w).length;
 h+=`<div class="clip"><div class="lbl" style="text-align:center">Futbol Zinciri · Grid #${CUR}</div><div class="ct">${esc(nickTitle(S.user))}</div>${mapHtml(false)}<div class="cf">${r.l} halka${r.l===OPT?" · en kısa yol":""}</div></div>
 <div class="shr"><button class="g" id="ig">${IG}Instagram</button><button class="g" id="xx">${XI}X</button><button class="g" id="dl">${DLI}Görsel indir</button></div>
 <div class="card"><p class="mu" style="margin:0">Hata: ${r.m||0} · İpucu: ${r.h||0}/3. ${r.l===OPT?"Mükemmel, en kısa yol!":"En kısa yol: "+HINT.path.map(i=>esc(P[i].n)).join(" → ")}</p></div>
 <div class="card stats"><div><b>${n}</b><span class="mu">çözülen</span></div><div><b>${streak()}</b><span class="mu">seri</span></div></div>`+(CUR===TODAY?`<p class="mu" style="text-align:center">Yeni grid 00:00'da!</p>`:"")+gnum("st");
-app.innerHTML=h;document.getElementById("ig").onclick=()=>doShare("ig");document.getElementById("xx").onclick=()=>doShare("x");document.getElementById("dl").onclick=()=>doShare("dl");bindNav();return}
+paint(h);document.getElementById("ig").onclick=()=>doShare("ig");document.getElementById("xx").onclick=()=>doShare("x");document.getElementById("dl").onclick=()=>doShare("dl");bindNav();return}
 const last=chain[chain.length-1];
-h+=`<div class="card"><div class="mu">Şu an <b style="color:var(--ac)">${esc(P[last].n)}</b> adasındasın. Onunla ortak takımda oynamış bir futbolcu yaz. Hedefle oynamış birine ulaşınca zincir otomatik tamamlanır.</div><p></p><input id="q" placeholder="Futbolcu ara…" value="${esc(q)}" autocomplete="off"><div class="msg">${esc(msg)}</div><div class="info">${esc(info)}</div><div id="sg"></div><div class="row sp"><span class="mu">Hata: ${mist} · İpucu: ${HN}/3</span><span class="row"><button class="g" id="hn" ${HN>=3?"disabled":""}>${BULB}İpucu</button><button class="g" id="un" ${chain.length<2?"disabled":""}>Geri al</button></span></div></div>`;
-app.innerHTML=h;bindNav();const inp=document.getElementById("q"),sg=document.getElementById("sg");
+h+=`<div class="card"><div class="mu">Şu an <b style="color:var(--ac)">${esc(P[last].n)}</b> adasındasın. Onunla ortak takımda oynamış bir futbolcu yaz. Hedefle oynamış birine ulaşınca zincir otomatik tamamlanır.</div><p></p><input id="q" placeholder="Futbolcu ara…" value="${esc(q)}" autocomplete="off"><div class="msg">${esc(msg)}</div><div class="info">${esc(info)}</div><div id="sg"></div><div class="row sp"><span class="mu">Hata: ${mist} · İpucu: ${HN}/3</span><span class="row"><button class="g" id="hn" ${HN>=3?"disabled":""}>${BULB}İpucu</button></span></div></div>`;
+paint(h);bindNav();const inp=document.getElementById("q"),sg=document.getElementById("sg");
 inp.oninput=()=>{q=inp.value;const v=norm(q);if(!v){sg.innerHTML="";return}const L=[];for(let i=0;i<P.length&&L.length<6;i++)if(!chain.includes(i)&&norm(P[i].n).includes(v))L.push(i);
 sg.innerHTML=L.length?`<div class="card" style="padding:0;margin:8px 0">`+L.map(i=>`<div class="sg row" data-i="${i}">${av(i,"sm")}<div>${esc(P[i].n)}<div class="mu">${esc(P[i].c||"")}</div></div></div>`).join("")+`</div>`:"";
 sg.querySelectorAll(".sg").forEach(e=>e.onclick=()=>pick(+e.dataset.i))};
 if(q)inp.oninput();
 document.getElementById("hn").onclick=hint;
-document.getElementById("un").onclick=()=>{if(chain.length>1){chain.pop();msg="";info="";q="";sp();render()}}}
+}
 function pick(i){q="";info="";const last=chain[chain.length-1];
 if(ADJ[last].has(i)){chain.push(i);msg="";
 if(i===B||ADJ[i].has(B)){if(i!==B)chain.push(B);S.days[CUR]={w:1,l:chain.length-1,m:mist,h:HN,c:chain.map(x=>P[x].id),a:P[A].id,b:P[B].id,live:CUR===TODAY?1:0};delete S.prog[CUR];save();return render()}}
