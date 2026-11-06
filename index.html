@@ -44,7 +44,7 @@ button.ar{background:none;border:0;box-shadow:none;color:rgba(255,255,255,.38);p
 .tag{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,196,0,.9);white-space:nowrap}
 .chips{display:flex;justify-content:center;gap:4px;margin-top:6px}.hc{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;font-size:11px;font-weight:600;color:var(--mu)}
 .gnum{position:absolute;left:0;right:0;bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px}.gt{font-size:13px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,.38);min-width:46px;text-align:center}
-.clip{margin:18px 4px 8px;padding:16px 8px 12px;background:#0b0b0b;border:7px solid #f2eee2;border-radius:8px;transform:rotate(-1.2deg);box-shadow:0 20px 44px rgba(0,0,0,.65)}
+.clip{margin:24px 6px 12px;padding:12px 6px 10px;background:#0b0b0b;border:20px solid transparent;border-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' stroke='%23FFC400' stroke-width='1.5' stroke-linejoin='round'%3E%3Cpath d='M0 1H60M0 59H60M1 0V60M59 0V60M20 19H40M20 41H40M19 20V40M41 20V40'/%3E%3Crect x='4' y='4' width='12' height='12'/%3E%3Crect x='4' y='4' width='12' height='12' transform='rotate(45 10 10)'/%3E%3Crect x='44' y='4' width='12' height='12'/%3E%3Crect x='44' y='4' width='12' height='12' transform='rotate(45 50 10)'/%3E%3Crect x='4' y='44' width='12' height='12'/%3E%3Crect x='4' y='44' width='12' height='12' transform='rotate(45 10 50)'/%3E%3Crect x='44' y='44' width='12' height='12'/%3E%3Crect x='44' y='44' width='12' height='12' transform='rotate(45 50 50)'/%3E%3Cpath d='M30 4l6 6-6 6-6-6zM30 44l6 6-6 6-6-6zM10 24l6 6-6 6-6-6zM50 24l6 6-6 6-6-6z'/%3E%3C/g%3E%3Cg fill='%23FFC400'%3E%3Ccircle cx='10' cy='10' r='1.5'/%3E%3Ccircle cx='50' cy='10' r='1.5'/%3E%3Ccircle cx='10' cy='50' r='1.5'/%3E%3Ccircle cx='50' cy='50' r='1.5'/%3E%3Ccircle cx='30' cy='10' r='1.5'/%3E%3Ccircle cx='30' cy='50' r='1.5'/%3E%3Ccircle cx='10' cy='30' r='1.5'/%3E%3Ccircle cx='50' cy='30' r='1.5'/%3E%3C/g%3E%3C/svg%3E") 20 round;transform:rotate(-1.8deg);box-shadow:0 20px 44px rgba(0,0,0,.65)}
 .clip .map{margin:0;border:0;background:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
 .ct{text-align:center;font-size:22px;font-weight:800;letter-spacing:-.4px;color:#fff;margin:6px 0 0}
 .cf{text-align:center;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,196,0,.9);margin-top:4px}
@@ -61,6 +61,8 @@ details.qa summary::-webkit-details-marker{display:none}
 details.qa summary::after{content:"";flex:none;width:7px;height:7px;border-right:2px solid var(--mu);border-bottom:2px solid var(--mu);transform:rotate(45deg);transition:transform .2s;margin-right:4px}
 details.qa[open] summary::after{transform:rotate(-135deg)}
 details.qa p{color:#bdb8a3;font-size:13.5px;line-height:1.6;margin:0 0 15px}
+button.mc{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;text-align:left;background:var(--glass);border:1px solid var(--line);box-shadow:none;border-radius:20px;padding:16px 18px;margin:12px 0;color:#fff;font:inherit}
+button.mc b{font-size:17px;font-weight:800}button.mc span{font-size:13px;font-weight:500;color:#bdb8a3;line-height:1.5}button.mc.on{border-color:rgba(255,196,0,.7);background:rgba(255,196,0,.08)}
 </style></head><body><div id="app"></div>
 <script>
 // ===== AYARLAR: CSV dosyalarının repo içindeki yolu =====
@@ -117,9 +119,11 @@ const D=await build(U);try{Object.keys(localStorage).filter(k=>k.startsWith("tz_
 load().then(init).catch(e=>app.innerHTML=`<div class="card"><b>Hata</b><pre style="white-space:pre-wrap;font-size:13px">${esc(e.message)}</pre><p class="mu">Çözülmezse bu mesajı Claude'a yapıştır.</p></div>`);
 
 // ===== Oyun =====
-const EPOCH=Date.UTC(2026,10,1),TZ="Europe/Istanbul"; // EPOCH: #1 numaralı gridin tarihi
+const EPOCH=Date.UTC(2026,9,30),TZ="Europe/Istanbul"; // EPOCH: #1 numaralı gridin tarihi
 const TR4=[141,36,114,449];let VIEW="game",MENU=false,TIER=[],HINT,HN=0,info="",IDX={},POP=[],W=[];
 const dayNo=()=>{const[y,m,d]=new Date().toLocaleDateString("sv",{timeZone:TZ}).split("-").map(Number);return Math.max(1,Math.floor((Date.UTC(y,m-1,d)-EPOCH)/864e5)+1)};
+const K=n=>(S.mode==="hard"?"h":"")+n; // her modun kendi grid kaydı ve serisi var
+const solvedN=()=>Object.entries(S.days).filter(([k,d])=>d&&d.w&&(S.mode==="hard")===k.startsWith("h")).length;
 const ov=(x,y)=>{const o=Math.min(x[2],y[2])-Math.max(x[1],y[1]);return o>=0.25||(o>0&&x[2]>=2026.8&&y[2]>=2026.8)}; // ikisi de hâlâ aynı kulüpteyse süre ne olursa olsun takım arkadaşı
 const shared=(i,j)=>{const r=new Set;for(const x of P[i].s)for(const y of P[j].s)if(x[0]===y[0]&&ov(x,y))r.add(x[0]);return[...r]};
 function bfs(a){const d=new Int16Array(P.length).fill(-1),pr=new Int32Array(P.length).fill(-1);d[a]=0;const q=[a];for(let h=0;h<q.length;h++){const x=q[h];for(const y of ADJ[x])if(d[y]<0){d[y]=d[x]+1;pr[y]=x;q.push(y)}}return{d,pr}}
@@ -136,20 +140,20 @@ const old=[];P.forEach((p,i)=>{if(f[i]<80&&Math.max(...p.s.map(x=>x[2]))<2019)ol
 old.sort((a,b)=>b[1]-a[1]).forEach(([i],r)=>{if(r<150)TIER[i]=Math.max(TIER[i],2);else if(r<600)TIER[i]=Math.max(TIER[i],1)});
 TODAY=dayNo();CUR=TODAY;READY=true;if(S.user)loadPuzzle(CUR);else login();
 setInterval(tick,20000);document.addEventListener("visibilitychange",tick)}
-function makePuzzle(n){const R=rng(n*7919+13),by=[[],[],[],[]];TIER.forEach((t,i)=>by[t].push(i));
+function makePuzzle(n){const hard=S.mode==="hard",R=rng(n*7919+13+(hard?500009:0)),by=[[],[],[],[]];TIER.forEach((t,i)=>by[t].push(i));
 const tryP=(t1,t2)=>{for(let k=0;k<300;k++){const a=by[t1][Math.floor(R()*by[t1].length)],{d}=bfs(a),c=by[t2].filter(j=>j!==a&&d[j]>=3&&d[j]<=4);
 if(c.length){const b=c[Math.floor(R()*c.length)];return R()<.5?[a,b,d[b]]:[b,a,d[b]]}}return null};
-const u=R(),[t1,t2]=u<.40?[3,3]:u<.74?[3,2]:u<.90?[2,2]:[3,1]; // %40 çok+çok, %34 çok+orta, %16 orta+orta, %10 çok+az bilinen (az bilinen hep çok bilinenle eşleşir)
+const u=R(),[t1,t2]=hard?(u<.20?[3,3]:u<.50?[3,2]:u<.75?[2,2]:u<.90?[3,1]:[2,1]):(u<.72?[3,3]:u<.97?[3,2]:[2,2]); // normal: %72 çok+çok, %25 çok+orta, %3 orta+orta | hard: karışık, az bilinenler de çıkar
 return tryP(t1,t2)||tryP(3,3)||tryP(3,2)}
 const clubsOf=i=>[...new Set(P[i].s.map(x=>x[0]))];
-const done=()=>!!(S.days[CUR]&&S.days[CUR].w);
-const sp=()=>{S.prog[CUR]={v:2,c:chain.map(i=>P[i].id),m:mist,h:HN};save()};
+const done=()=>!!(S.days[K(CUR)]&&S.days[K(CUR)].w);
+const sp=()=>{S.prog[K(CUR)]={v:2,c:chain.map(i=>P[i].id),m:mist,h:HN};save()};
 function loadPuzzle(n){CUR=n;const pz=makePuzzle(n);if(!pz)return app.textContent="Bulmaca üretilemedi.";[A,B,OPT]=pz;
-const Rh=rng(n*131+7),{pr}=bfs(A),path=[];for(let x=B;x>=0;x=pr[x])path.unshift(x);
+const Rh=rng(n*131+7+(S.mode==="hard"?99991:0)),{pr}=bfs(A),path=[];for(let x=B;x>=0;x=pr[x])path.unshift(x);
 const pc=i=>{const c=clubsOf(i);return c[Math.floor(Rh()*c.length)]};
 HINT={bc:pc(B),ac:pc(A),mid:path.length>2?path[1+Math.floor(Rh()*(path.length-2))]:null,path};
-let d=S.days[n];if(d&&(d.a!==P[A].id||d.b!==P[B].id)){delete S.days[n];d=null;save()}
-const g=S.prog[n];
+let d=S.days[K(n)];if(d&&(d.a!==P[A].id||d.b!==P[B].id)){delete S.days[K(n)];d=null;save()}
+const g=S.prog[K(n)];
 if(d&&d.w){chain=(d.c||[]).map(id=>IDX[id]).filter(x=>x!=null);if(chain.length<2||chain[0]!==A||chain[chain.length-1]!==B)chain=path.slice();mist=d.m||0;HN=d.h||0}
 else{chain=g&&g.v===2?g.c.map(id=>IDX[id]).filter(x=>x!=null):[];if(!chain.length||chain[0]!==A){chain=[A];mist=0;HN=0}else{mist=g.m||0;HN=g.h||0}}
 msg="";info="";q="";render()}
@@ -158,7 +162,7 @@ const ini=n=>n.split(" ").map(w=>w[0]).slice(0,2).join("");
 const av=(i,c)=>`<span class="av ${c||""}" style="background:hsl(${hue(P[i].n)},45%,30%)">${esc(ini(P[i].n))}${P[i].img?`<img src="${esc(P[i].img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</span>`;
 const cl=c=>`<span class="cl" title="${esc(CN[c]||"")}" style="background:hsl(${hue(c)},55%,40%)">${esc((CN[c]||"").replace(/[^A-Za-zÇĞİÖŞÜçğıöşü]/g,"").slice(0,3).toUpperCase())}<img src="${LOGO(c)}" alt="" loading="lazy" onerror="this.remove()"></span>`;
 const hc=c=>`<div class="hc">${cl(c)}<span>${esc(CN[c]||"")}</span></div>`;
-const livew=n=>S.days[n]?.w&&S.days[n].live;
+const livew=n=>S.days[K(n)]?.w&&S.days[K(n)].live;
 const streak=()=>{let n=TODAY;if(!livew(n))n--;let c=0;while(n>0&&livew(n)){c++;n--}return c};
 function start(){app.innerHTML=`<div class="splash"><div class="logo xl">Futbol <span>Zinciri</span></div><div class="spin"></div><div class="mu" id="prog">Yükleniyor…</div></div>`}
 function login(){app.innerHTML=`<div class="splash"><div class="logo xl">Futbol <span>Zinciri</span></div><p class="mu" style="max-width:290px;margin:0">İki futbolcuyu ortak takım arkadaşlarıyla bağla. Her gün yeni bir grid.</p><div class="card" style="width:100%;text-align:left"><div class="lbl">Hesap oluştur</div><p class="mu">Bir nick seç, bir daha giriş yapman gerekmez.</p><input id="u" maxlength="16" placeholder="Nick" autocomplete="off" autocapitalize="off"><div class="msg" id="e"></div><button id="go" style="width:100%">Başla</button></div></div>`;
@@ -168,24 +172,28 @@ const nickTitle=n=>{const l=n.toLocaleLowerCase("tr"),V="aeıioöuü",v=[...l].f
 const IG='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg>',XI='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.8 3h3.1l-6.8 7.7L22 21h-6.2l-4.9-6.3L5.3 21H2.2l7.3-8.3L2 3h6.4l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/></svg>',DLI='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>';
 const loadImg=u=>new Promise(res=>{if(!u)return res(null);let ok=false;const fin=v=>{if(!ok){ok=true;res(v)}};setTimeout(()=>fin(null),7000);
 const t=(src,nx)=>{const im=new Image();im.crossOrigin="anonymous";im.onload=()=>fin(im);im.onerror=nx;im.src=src};t(u,()=>t("https://wsrv.nl/?url="+encodeURIComponent(u),()=>fin(null)))});
+function frame(x,W,H){const m=22,b=58;x.save();x.strokeStyle="#FFC400";x.fillStyle="#FFC400";x.lineWidth=3;x.strokeRect(m,m,W-2*m,H-2*m);x.strokeRect(m+b,m+b,W-2*(m+b),H-2*(m+b));x.lineWidth=2.5;
+const dia=(cx,cy,r)=>{x.beginPath();x.moveTo(cx,cy-r);x.lineTo(cx+r,cy);x.lineTo(cx,cy+r);x.lineTo(cx-r,cy);x.closePath();x.stroke();x.beginPath();x.arc(cx,cy,4,0,7);x.fill()};
+for(let cx=m+b*1.5+22;cx<W-m-b*1.5;cx+=66){dia(cx,m+b/2,19);dia(cx,H-m-b/2,19)}for(let cy=m+b*1.5+22;cy<H-m-b*1.5;cy+=66){dia(m+b/2,cy,19);dia(W-m-b/2,cy,19)}
+for(const[cx,cy]of[[m+b/2,m+b/2],[W-m-b/2,m+b/2],[m+b/2,H-m-b/2],[W-m-b/2,H-m-b/2]]){x.save();x.translate(cx,cy);x.strokeRect(-17,-17,34,34);x.rotate(Math.PI/4);x.strokeRect(-17,-17,34,34);x.restore();x.beginPath();x.arc(cx,cy,4,0,7);x.fill()}x.restore()}
 async function cardBlob(){const W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d"),F='"Plus Jakarta Sans",system-ui,sans-serif',ls=v=>{try{x.letterSpacing=v}catch(e){}};
 try{await Promise.all([document.fonts.load(`800 60px ${F}`),document.fonts.load(`700 34px ${F}`),document.fonts.load(`600 28px ${F}`)])}catch(e){}
 const nodes=[...chain].reverse(),imgs=await Promise.all(nodes.map(i=>loadImg(P[i].img)));
-x.fillStyle="#000";x.fillRect(0,0,W,H);const g=x.createRadialGradient(540,0,0,540,0,950);g.addColorStop(0,"rgba(255,196,0,.22)");g.addColorStop(1,"rgba(255,196,0,0)");x.fillStyle=g;x.fillRect(0,0,W,H);
-x.textAlign="center";x.fillStyle="#FFC400";x.font=`700 26px ${F}`;ls("5px");x.fillText("FUTBOL ZİNCİRİ · GRID #"+CUR,540,96);ls("0px");
-x.fillStyle="#fff";x.font=`800 62px ${F}`;x.fillText(nickTitle(S.user),540,184);
-const n=nodes.length,top=340,bot=1060,st=n>1?(bot-top)/(n-1):0,R=n>6?54:70,pts=nodes.map((_,k)=>({x:k===0||k===n-1?540:(k%2?320:760),y:top+k*st}));
+x.fillStyle="#000";x.fillRect(0,0,W,H);const g=x.createRadialGradient(540,0,0,540,0,950);g.addColorStop(0,"rgba(255,196,0,.22)");g.addColorStop(1,"rgba(255,196,0,0)");x.fillStyle=g;x.fillRect(0,0,W,H);frame(x,W,H);
+x.textAlign="center";x.fillStyle="#FFC400";x.font=`700 26px ${F}`;ls("5px");x.fillText("FUTBOL ZİNCİRİ · GRID #"+CUR+(S.mode==="hard"?" · HARD":""),540,146);ls("0px");
+x.fillStyle="#fff";x.font=`800 62px ${F}`;x.fillText(nickTitle(S.user),540,226);
+const n=nodes.length,top=395,bot=1030,st=n>1?(bot-top)/(n-1):0,R=n>6?54:70,pts=nodes.map((_,k)=>({x:k===0||k===n-1?540:(k%2?320:760),y:top+k*st}));
 x.setLineDash([2,20]);x.lineCap="round";x.lineWidth=7;x.strokeStyle="rgba(255,196,0,.4)";x.beginPath();x.moveTo(pts[0].x,pts[0].y);for(let k=1;k<n;k++){const a=pts[k-1],b=pts[k],m=(a.y+b.y)/2;x.bezierCurveTo(a.x,m,b.x,m,b.x,b.y)}x.stroke();x.setLineDash([]);
 nodes.forEach((i,k)=>{const p=pts[k],r=k===0||k===n-1?R+12:R,im=imgs[k];x.save();x.shadowColor="rgba(255,196,0,.35)";x.shadowBlur=40;x.beginPath();x.arc(p.x,p.y,r,0,7);x.fillStyle="hsl("+hue(P[i].n)+",45%,30%)";x.fill();x.restore();
 x.save();x.beginPath();x.arc(p.x,p.y,r,0,7);x.clip();if(im){const s=Math.min(im.width,im.height);x.drawImage(im,(im.width-s)/2,0,s,s,p.x-r,p.y-r,2*r,2*r)}else{x.fillStyle="#fff";x.font=`700 ${r*.7}px ${F}`;x.fillText(ini(P[i].n),p.x,p.y+r*.25)}x.restore();
 x.beginPath();x.arc(p.x,p.y,r,0,7);x.lineWidth=5;x.strokeStyle="#FFC400";x.stroke();
 x.fillStyle="#fff";x.font=`700 ${n>6?30:34}px ${F}`;x.fillText(P[i].n,p.x,p.y+r+46);
 if(k===0||k===n-1){x.fillStyle="rgba(255,196,0,.9)";x.font=`700 20px ${F}`;ls("3px");x.fillText(k===0?"HEDEF":"BAŞLANGIÇ",p.x,p.y-r-22);ls("0px")}});
-x.fillStyle="rgba(255,255,255,.6)";x.font=`600 32px ${F}`;x.fillText(`${chain.length-1} halkada bağlandı`,540,1230);
-x.fillStyle="rgba(255,255,255,.3)";x.font=`500 24px ${F}`;x.fillText(location.host,540,1285);
+x.fillStyle="rgba(255,255,255,.6)";x.font=`600 32px ${F}`;x.fillText(`${chain.length-1} halkada bağlandı`,540,1198);
+x.fillStyle="rgba(255,255,255,.3)";x.font=`500 24px ${F}`;x.fillText(location.host,540,1240);
 return new Promise(r=>c.toBlob(r,"image/png"))}
 function dl(b){const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`futbol-zinciri-${CUR}.png`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
-async function doShare(kind){const r=S.days[CUR],txt=`Futbol Zinciri #${CUR}: ${P[A].n} → ${P[B].n}, ${r.l} halkada bağladım!${r.m?" ("+r.m+" hata)":""}`;
+async function doShare(kind){const r=S.days[K(CUR)],txt=`Futbol Zinciri #${CUR}${S.mode==="hard"?" (Hard)":""}: ${P[A].n} → ${P[B].n}, ${r.l} halkada bağladım!${r.m?" ("+r.m+" hata)":""}`;
 if(kind==="x")return window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(txt)+"&url="+encodeURIComponent(location.href.split("#")[0]),"_blank");
 const bs=[...document.querySelectorAll(".shr button")];bs.forEach(b=>b.disabled=true);
 try{const blob=await cardBlob();if(!blob)throw 0;const file=new File([blob],`futbol-zinciri-${CUR}.png`,{type:"image/png"});
@@ -217,11 +225,11 @@ function hint(){if(HN>=3||done())return;HN++;
 info=HN===1?`${P[B].n}, ${CN[HINT.bc]} forması giymiş.`:HN===2?`${P[A].n}, ${CN[HINT.ac]} forması giymiş.`:`Zincirde ${P[HINT.mid].n} var.`;sp();render()}
 const MB='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
 const hdr=()=>`<div class="hd"><div class="row" style="gap:6px"><button class="mb" id="mb" aria-label="Menü">${MB}</button><div class="logo">Futbol <span>Zinciri</span></div></div><div class="pill">${esc(S.user)}<i></i>${FL}${streak()}</div></div>`;
-const drawer=()=>`<div class="dim" id="dim"></div><aside class="drw" id="drw"><div class="logo" style="margin:4px 14px 18px">Futbol <span>Zinciri</span></div>${[["game","Oyun"],["profile","Profil"],["faq","SSS"]].map(([v,t])=>`<button class="mi ${VIEW===v?"on":""}" data-v="${v}">${t}</button>`).join("")}</aside>`;
+const drawer=()=>`<div class="dim" id="dim"></div><aside class="drw" id="drw"><div class="logo" style="margin:4px 14px 18px">Futbol <span>Zinciri</span></div>${[["game","Oyun"],["mode","Mod: "+(S.mode==="hard"?"Hard":"Normal")],["profile","Profil"],["faq","SSS"]].map(([v,t])=>`<button class="mi ${VIEW===v?"on":""}" data-v="${v}">${t}</button>`).join("")}</aside>`;
 function paint(h){app.innerHTML=h+drawer();const dm=document.getElementById("dim"),dr=document.getElementById("drw"),set=o=>{MENU=o;dm.classList.toggle("on",o);dr.classList.toggle("on",o)};
 document.getElementById("mb").onclick=()=>set(true);dm.onclick=()=>set(false);
 dr.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{VIEW=b.dataset.v;MENU=false;render()})}
-function profile(){const n=Object.values(S.days).filter(d=>d&&d.w).length;
+function profile(){const n=solvedN();
 paint(hdr()+`<div class="card"><div class="lbl">Profil</div><p class="mu">Takma adını buradan değiştirebilirsin. Çözdüğün gridler ve serin korunur.</p><input id="nn" maxlength="16" value="${esc(S.user)}" autocomplete="off" autocapitalize="off"><div class="msg" id="pe"></div><button id="sv" style="width:100%">Kaydet</button></div><div class="card stats"><div><b>${n}</b><span class="mu">çözülen</span></div><div><b>${streak()}</b><span class="mu">seri</span></div></div>`);
 document.getElementById("sv").onclick=()=>{const v=document.getElementById("nn").value.trim();if(!/^[\p{L}\p{N}_.\-]{3,16}$/u.test(v))return document.getElementById("pe").textContent="3-16 karakter: harf, rakam, _ . -";S.user=v;save();VIEW="game";render()}}
 const QA=[["Oyun nasıl oynanır?","Her gün iki futbolcu verilir: hedef üstte, başlangıç altta. Başlangıç oyuncusuyla aynı dönemde ortak bir takımda oynamış bir futbolcu yaz, sonra onunla oynamış birini yaz... Hedef oyuncuyla oynamış birine ulaştığında zincir otomatik tamamlanır. Ne kadar az halkayla bağlarsan o kadar iyi."],
@@ -230,15 +238,20 @@ const QA=[["Oyun nasıl oynanır?","Her gün iki futbolcu verilir: hedef üstte,
 ["Tahmin hakkım var mı?","Tahmin sınırı yok. Yanlış tahminler sadece “hata” olarak sayılır ve paylaşımında görünür."],
 ["İpuçları nasıl çalışıyor?","Her gridde 3 ipucu hakkın var. 1. ipucu hedef oyuncunun bir takımını, 2. ipucu başlangıç oyuncusunun bir takımını, 3. ipucu da en kısa zincirde yer alan bir oyuncuyu gösterir."],
 ["Kimler takım arkadaşı sayılıyor?","Aynı kulüpte en az birkaç ay aynı dönemde bulunmuş oyuncular. Veri Transfermarkt transfer geçmişine dayanır, maça çıkıp çıkmadıkları dikkate alınmaz."],
-["Günün oyuncuları nasıl seçiliyor?","Oyuncular tanınırlıklarına göre gruplanır. Hiç tanınmayanlar günün oyuncusu olmaz. Az bilinen bir oyuncu çıkarsa diğeri mutlaka çok bilinen biri olur, böylece zorluk dengede kalır."],
+["Normal ve Hard mod nedir?","Normal modda bilindik oyuncular çok daha sık çıkar. Hard modda havuz daha karışıktır, az bilinen isimler de gelir. Menüden istediğin zaman mod değiştirebilirsin. Her modun kendi gridi ve serisi vardır."],["Günün oyuncuları nasıl seçiliyor?","Oyuncular tanınırlıklarına göre gruplanır. Hiç tanınmayanlar günün oyuncusu olmaz. Az bilinen bir oyuncu çıkarsa diğeri çok bilinen ya da orta tanınırlıkta biri olur, böylece zorluk dengede kalır."],
 ["Serim nasıl artıyor?","Günün gridini o gün çözersen seri bir artar. Bir günü atlarsan seri sıfırlanır."],
 ["İlerlemem nerede saklanıyor?","Hesabın ve ilerlemen şimdilik bu cihazın tarayıcısında saklanır. Tarayıcı verisini silersen veya başka cihaz kullanırsan sıfırlanır."],
 ["Sonucumu nasıl paylaşırım?","Bir gridi çözünce zincirin kart olarak çıkar. Altındaki butonlarla görseli indirebilir, Instagram'da veya X'te paylaşabilirsin."]];
 function faq(){paint(hdr()+`<div class="card" style="margin-bottom:4px"><div class="lbl">Sıkça sorulan sorular</div></div>`+QA.map(([q,a])=>`<details class="qa"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join(""))}
-function render(){if(!S.user)return login();if(VIEW==="profile")return profile();if(VIEW==="faq")return faq();const dn=done();
+const MODES=[["normal","Normal","Bilindik oyuncular çok daha sık çıkar. Rahat ve keyifli."],["hard","Hard","Daha karışık bir havuz: az bilinen isimler de çıkar. Zinciri kurmak daha zor."]];
+function modeScreen(){const first=!S.mode,cards=MODES.map(([k,t,d])=>`<button class="mc ${S.mode===k?"on":""}" data-m="${k}"><b>${t}</b><span>${d}</span></button>`).join(""),note=`<p class="mu" style="text-align:center">İstediğin zaman menüden değiştirebilirsin. Her modun kendi gridi ve serisi var.</p>`;
+if(first)app.innerHTML=`<div class="splash"><div class="logo xl">Futbol <span>Zinciri</span></div><div style="width:100%"><div class="lbl" style="text-align:center;margin-bottom:6px">Modunu seç</div>${cards}${note}</div></div>`;
+else paint(hdr()+`<div class="lbl" style="margin:16px 4px 0">Modunu seç</div>${cards}${note}`);
+document.querySelectorAll(".mc").forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;save();VIEW="game";loadPuzzle(CUR)})}
+function render(){if(!S.user)return login();if(!S.mode||VIEW==="mode")return modeScreen();if(VIEW==="profile")return profile();if(VIEW==="faq")return faq();const dn=done();
 let h=hdr()+mapHtml();
-if(dn){const r=S.days[CUR],n=Object.values(S.days).filter(d=>d&&d.w).length;
-h+=`<div class="clip"><div class="lbl" style="text-align:center">Futbol Zinciri · Grid #${CUR}</div><div class="ct">${esc(nickTitle(S.user))}</div>${mapHtml(false)}<div class="cf">${r.l} halka${r.l===OPT?" · en kısa yol":""}</div></div>
+if(dn){const r=S.days[K(CUR)],n=solvedN();
+h+=`<div class="clip"><div class="lbl" style="text-align:center">Futbol Zinciri · Grid #${CUR}${S.mode==="hard"?" · Hard":""}</div><div class="ct">${esc(nickTitle(S.user))}</div>${mapHtml(false)}<div class="cf">${r.l} halka${r.l===OPT?" · en kısa yol":""}</div></div>
 <div class="shr"><button class="g" id="ig">${IG}Instagram</button><button class="g" id="xx">${XI}X</button><button class="g" id="dl">${DLI}Görsel indir</button></div>
 <div class="card"><p class="mu" style="margin:0">Hata: ${r.m||0} · İpucu: ${r.h||0}/3. ${r.l===OPT?"Mükemmel, en kısa yol!":"En kısa yol: "+HINT.path.map(i=>esc(P[i].n)).join(" → ")}</p></div>
 <div class="card stats"><div><b>${n}</b><span class="mu">çözülen</span></div><div><b>${streak()}</b><span class="mu">seri</span></div></div>`+(CUR===TODAY?`<p class="mu" style="text-align:center">Yeni grid 00:00'da!</p>`:"")+gnum("st");
@@ -254,7 +267,7 @@ document.getElementById("hn").onclick=hint;
 }
 function pick(i){q="";info="";const last=chain[chain.length-1];
 if(ADJ[last].has(i)){chain.push(i);msg="";
-if(i===B||ADJ[i].has(B)){if(i!==B)chain.push(B);S.days[CUR]={w:1,l:chain.length-1,m:mist,h:HN,c:chain.map(x=>P[x].id),a:P[A].id,b:P[B].id,live:CUR===TODAY?1:0};delete S.prog[CUR];save();return render()}}
+if(i===B||ADJ[i].has(B)){if(i!==B)chain.push(B);S.days[K(CUR)]={w:1,l:chain.length-1,m:mist,h:HN,c:chain.map(x=>P[x].id),a:P[A].id,b:P[B].id,live:CUR===TODAY?1:0};delete S.prog[K(CUR)];save();return render()}}
 else{mist++;msg=`${P[i].n}, ${P[last].n} ile ortak takımda oynamadı`}
 sp();render()}
 start();
